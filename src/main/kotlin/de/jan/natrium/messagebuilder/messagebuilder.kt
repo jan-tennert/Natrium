@@ -2,6 +2,7 @@ package de.jan.natrium.messagebuilder
 
 import de.jan.natrium.interactions.ActionRowBuilder
 import de.jan.natrium.interactions.RowBuilder
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.MessageBuilder
 import net.dv8tion.jda.api.entities.IMentionable
@@ -35,6 +36,10 @@ class KMessageBuilder(private val jda: JDA? = null) {
 
     fun addActionRow(jda: JDA? = this.jda, builder: RowBuilder.() -> Unit) {
         actionRows += ActionRow.of(RowBuilder(jda).apply(builder).components)
+    }
+
+    fun embed(builder: EmbedBuilder.() -> Unit) {
+        embeds += EmbedBuilder().apply(builder).build()
     }
 
     fun codeblock(code: String, language: String) {
