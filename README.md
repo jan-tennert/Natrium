@@ -1,6 +1,7 @@
 # Natrium
 
-A command framework with normal and slash commands for JDA with some useful Kotlin Extensions
+A command framework with normal and slash commands for JDA with some useful Kotlin Extensions 
+# Warning: This project is still pretty much WiP
 
 # Features:
 - Command Handler for [SlashCommands](https://github.com/jan-tennert/Natrium/wiki/SlashCommands), StandardCommands and both (HybridCommands)
