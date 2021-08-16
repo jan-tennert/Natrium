@@ -4,7 +4,6 @@ import de.jan.natrium.interactions.ActionRowBuilder
 import de.jan.natrium.interactions.RowBuilder
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
-import net.dv8tion.jda.api.MessageBuilder
 import net.dv8tion.jda.api.entities.IMentionable
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed

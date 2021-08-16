@@ -8,6 +8,8 @@ complexity:
     active: false
   NestedBlockDepth:
     active: false
+  ComplexMethod:
+    active: false
 
 coroutines:
   active: true
@@ -30,6 +32,8 @@ exceptions:
     active: true
   ThrowingExceptionInMain:
     active: true
+  TooGenericExceptionCaught:
+    active: false
 
 naming:
   MatchingDeclarationName:
@@ -104,14 +108,14 @@ style:
     active: true
   MaxLineLength:
     active: true
-    maxLineLength: 200
+    maxLineLength: 300
     excludeCommentStatements: true
   NoTabs:
     active: true
   ObjectLiteralToLambda:
     active: true
   OptionalUnit:
-    active: true
+    active: false
   OptionalWhenBraces:
     active: true
   PreferToOverPairSyntax:

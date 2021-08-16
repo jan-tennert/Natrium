@@ -1,7 +1,6 @@
 package de.jan.natrium.interactions
 
 import de.jan.natrium.TypeSafeBuilder
-import de.jan.natrium.commands.builders.OptionsBuilder
 import de.jan.natrium.events.on
 import net.dv8tion.jda.api.entities.Emoji
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent

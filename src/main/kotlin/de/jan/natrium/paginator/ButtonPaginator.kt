@@ -90,9 +90,9 @@ class ButtonPaginator private constructor(
 
 data class PaginatorButton(val label: String? = null, val emoji: Emoji? = null, val style: ButtonStyle = ButtonStyle.PRIMARY)
 
-fun generateId() : String {
+fun generateId(maxLength: Int = 20) : String {
     val chars = ('A'..'Z').toList() + ('a'..'z').toList()
     var id = ""
-    while(id.length != 99) id += chars.random()
+    while(id.length != maxLength) id += chars.random()
     return id
 }

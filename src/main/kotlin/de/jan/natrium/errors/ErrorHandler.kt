@@ -1,11 +1,9 @@
 package de.jan.natrium.errors
 
-import de.jan.natrium.TypeSafeBuilder
+import de.jan.natrium.commands.Command
 import de.jan.natrium.commands.CommandOrigin
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.User
-import kotlin.Exception
-import de.jan.natrium.commands.Command
 
 open class ErrorHandler {
 
@@ -59,4 +57,4 @@ class ErrorHandlerImpl {
 
 }
 
-inline fun ErrorHandler(builder: ErrorHandlerImpl.() -> Unit) = ErrorHandlerImpl().apply(builder).build()
+inline fun errorHandler(builder: ErrorHandlerImpl.() -> Unit) = ErrorHandlerImpl().apply(builder).build()

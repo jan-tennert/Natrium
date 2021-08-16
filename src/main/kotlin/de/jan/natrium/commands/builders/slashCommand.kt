@@ -2,6 +2,7 @@ package de.jan.natrium.commands.builders
 
 import de.jan.natrium.TypeSafeBuilder
 import de.jan.natrium.commands.SlashCommand
+import de.jan.natrium.commands.builders.SlashCommandImpl.Action
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
