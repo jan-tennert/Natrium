@@ -6,7 +6,7 @@ A command framework with normal and slash commands for JDA with some useful Kotl
 # Features:
 - Command Handler for [SlashCommands](https://github.com/jan-tennert/Natrium/wiki/SlashCommands), StandardCommands and both (HybridCommands)
 - RestAction extensions
-- Button Paginator (TODO)
+- [Button Paginator](https://github.com/jan-tennert/Natrium/wiki/ButtonPaginator)
 - Coroutine Event Manager
 - Embed extensions
 - Music Manager (TODO)
