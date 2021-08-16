@@ -10,6 +10,7 @@ A command framework with normal and slash commands for JDA with some useful Kotl
 - Coroutine Event Manager
 - Embed extensions
 - Music Manager (TODO)
+- [Component Builder](https://github.com/jan-tennert/Natrium/wiki/Components)
 
 # Download
 
