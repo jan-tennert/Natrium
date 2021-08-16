@@ -1,5 +1,6 @@
 package de.jan.natrium.commands.builders
 
+import de.jan.natrium.TypeSafeBuilder
 import de.jan.natrium.commands.SlashCommand
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent
@@ -29,14 +30,17 @@ class SlashCommandImpl(var name: String? = null, var description: String? = null
         this.action = action
     }
 
+    @TypeSafeBuilder
     fun options(builder: OptionsBuilder.() -> Unit) {
         options += OptionsBuilder().apply(builder).options
     }
 
+    @TypeSafeBuilder
     fun subCommands(builder: SubCommandBuilder.() -> Unit) {
         subCommands += SubCommandBuilder().apply(builder).subCommands
     }
 
+    @TypeSafeBuilder
     fun subCommandGroups(builder: SubCommandGroupsBuilder.() -> Unit) {
         subCommandGroups += SubCommandGroupsBuilder().apply(builder).subCommandGroups
     }

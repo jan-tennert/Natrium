@@ -31,7 +31,7 @@ class EventHandler : IEventManager {
     }
 
     override fun handle(event: GenericEvent) {
-        for (listener in listeners) {
+        for (listener in listeners.toList()) {
             scope.launch {
                 when (listener) {
                     is CoroutineHandler -> listener.handle(event)

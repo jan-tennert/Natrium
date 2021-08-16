@@ -5,6 +5,7 @@ import de.jan.natrium.events.on
 import de.jan.natrium.scope
 import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction
@@ -116,11 +117,11 @@ class CommandHandler internal constructor(val jda: JDA) {
                                 args += option.asString
                             }
 
-                            catchError {
+                            catchError(user, CommandOrigin(interaction = interaction)) {
                                 cmd.run(CommandResult(channel, args, user, member, CommandOrigin(interaction = interaction)))
                             }
                         } else if(cmd is SlashCommand) {
-                            catchError {
+                            catchError(user, CommandOrigin(interaction = interaction)) {
                                 cmd.run(this@on)
                             }
                         }
@@ -143,11 +144,11 @@ class CommandHandler internal constructor(val jda: JDA) {
                 if (cmd.name == command) {
                     jda.scope.launch {
                         if(cmd is HybridCommand) {
-                            catchError {
+                            catchError(user = author, CommandOrigin(channel)) {
                                 cmd.run(CommandResult(channel, args, author, member, CommandOrigin(channel)))
                             }
                         } else if(cmd is StandardCommand) {
-                            catchError {
+                            catchError(user = author, CommandOrigin(channel)) {
                                 cmd.run(message, args)
                             }
                         }
@@ -157,10 +158,10 @@ class CommandHandler internal constructor(val jda: JDA) {
         }
     }
 
-    private suspend fun catchError(method: suspend () -> Unit) = try {
+    private suspend fun catchError(user: User, origin: CommandOrigin, method: suspend () -> Unit) = try {
         method()
     } catch(e: Exception) {
-        errorHandler.onError(e)
+        errorHandler.onError(e, user, origin)
     }
 
 }

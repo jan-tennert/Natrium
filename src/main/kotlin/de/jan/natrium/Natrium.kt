@@ -16,3 +16,6 @@ fun JDA.launch(block: suspend CoroutineScope.() -> Unit) = scope.launch(block = 
 fun JDABuilder.enableNatrium() = setEventManager(EventHandler()).run { this@enableNatrium }
 
 fun JDA.createCommandHandler() = CommandHandler(this)
+
+@DslMarker
+annotation class TypeSafeBuilder

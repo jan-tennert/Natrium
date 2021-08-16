@@ -1,5 +1,6 @@
 package de.jan.natrium.commands.builders
 
+import de.jan.natrium.TypeSafeBuilder
 import de.jan.natrium.commands.StandardCommand
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Message

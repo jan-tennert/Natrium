@@ -1,5 +1,6 @@
 package de.jan.natrium.commands.builders
 
+import de.jan.natrium.TypeSafeBuilder
 import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
@@ -11,7 +12,7 @@ class OptionsBuilder {
     @PublishedApi
     internal val options = mutableListOf<OptionData>()
 
-    @OptionBuilder
+    @TypeSafeBuilder
     fun int(name: String, description: String, required: Boolean = true, choices: ChoiceBuilder<Int>.() -> Unit = {}) {
         val option = OptionData(OptionType.INTEGER, name, description, required)
         val choiceBuilder = ChoiceBuilder<Int>().apply(choices)
@@ -19,7 +20,7 @@ class OptionsBuilder {
         options += option
     }
 
-    @OptionBuilder
+    @TypeSafeBuilder
     fun string(name: String, description: String, required: Boolean = true, choices: ChoiceBuilder<String>.() -> Unit = {}) {
         val option = OptionData(OptionType.STRING, name, description, required)
         val choiceBuilder = ChoiceBuilder<String>().apply(choices)
@@ -27,33 +28,33 @@ class OptionsBuilder {
         options += option
     }
 
-    @OptionBuilder
+    @TypeSafeBuilder
     fun user(name: String, description: String, required: Boolean = true) {
         options += OptionData(OptionType.USER, name, description, required)
     }
 
-    @OptionBuilder
+    @TypeSafeBuilder
     fun mentionable(name: String, description: String, required: Boolean = true) {
         options += OptionData(OptionType.MENTIONABLE, name, description, required)
     }
 
-    @OptionBuilder
+    @TypeSafeBuilder
     fun channel(name: String, description: String, required: Boolean = true) {
         options += OptionData(OptionType.CHANNEL, name, description, required)
     }
 
-    @OptionBuilder
+    @TypeSafeBuilder
     fun boolean(name: String, description: String, required: Boolean = true) {
         options += OptionData(OptionType.BOOLEAN, name, description, required)
     }
 
-    @OptionBuilder
+    @TypeSafeBuilder
     fun role(name: String, description: String, required: Boolean = true) {
         options += OptionData(OptionType.ROLE, name, description, required)
     }
 
     /* TODO: JDA doesn't support that right now
-    @OptionBuilder
+    @TypeSafeBuilder
     fun number(name: String, description: String, required: Boolean = true, choices: ChoiceBuilder<Double>.() -> Unit = {}) {
         val option = OptionData(OptionType.NUMBER, name, description, required)
         val choiceBuilder = ChoiceBuilder<Double>().apply(choices)
@@ -68,7 +69,7 @@ class ChoiceBuilder<V> {
 
     internal val choices = mutableListOf<Command.Choice>()
 
-    @OptionBuilder
+    @TypeSafeBuilder
     fun choice(name: String, value: V) {
         if(value is Long) {
             choices += Command.Choice(name, value)
@@ -78,6 +79,3 @@ class ChoiceBuilder<V> {
     }
 
 }
-
-@DslMarker
-annotation class OptionBuilder
