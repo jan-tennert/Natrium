@@ -30,6 +30,7 @@ class KMessageBuilder(private val jda: JDA? = null) {
     fun mention(mention: IMentionable) = if(mention is Role) mentionedRoles.add(mention.id).run { Unit } else if(mention is User) mentionedUsers.add(mention.id).run { Unit } else Unit
 
     fun setActionRows(jda: JDA? = this.jda, builder: ActionRowBuilder.() -> Unit) {
+        actionRows.clear()
         actionRows += ActionRowBuilder(jda).apply(builder).rows
     }
 

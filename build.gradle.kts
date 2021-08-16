@@ -9,11 +9,12 @@ group = "de.jan.natrium"
 version = "1.0-SNAPSHOT"
 
 repositories {
-    mavenCentral()
     maven {
         name = "m2-dv8tion"
-        url = uri("https://m2.dv8tion.net/releases")
+        url = uri("http://m2.dv8tion.net/releases")
+        isAllowInsecureProtocol = true
     }
+    mavenCentral()
 }
 
 detekt {
