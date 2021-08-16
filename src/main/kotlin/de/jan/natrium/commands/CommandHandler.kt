@@ -1,5 +1,6 @@
 package de.jan.natrium.commands
 
+import de.jan.natrium.errors.ErrorHandler
 import de.jan.natrium.events.on
 import de.jan.natrium.scope
 import kotlinx.coroutines.launch
@@ -22,6 +23,7 @@ class CommandHandler internal constructor(val jda: JDA) {
             field = value
         }
     var allowMentionPrefix: Boolean = true //TODO
+    var errorHandler = ErrorHandler()
 
     init {
         initSlashCommandHandler()
@@ -56,7 +58,7 @@ class CommandHandler internal constructor(val jda: JDA) {
     fun finish(): CommandHandler {
         val cmds = slashCommands + hybridCommands
         val globalCommands = jda.updateCommands()
-        val guildCommands = hashMapOf<String, CommandListUpdateAction>()
+        val guildCommands = hashMapOf<Long, CommandListUpdateAction>()
         for (cmd in cmds) {
             if(!cmd.autoRegister) continue
             if(cmd.guildOnlyIds.isNotEmpty()) {
@@ -89,17 +91,38 @@ class CommandHandler internal constructor(val jda: JDA) {
             for (cmd in commands) {
                 if (cmd.name == name) {
                     jda.scope.launch {
+                        if(cmd.autoAcknowledge) deferReply().queue()
+                        if(cmd.requiredBotPermissions.isNotEmpty() && isFromGuild) {
+                            cmd.requiredBotPermissions.forEach {
+                                if(!guild!!.selfMember.hasPermission(it)) {
+                                    errorHandler.onMissingBotPermission(user, it, CommandOrigin(interaction = interaction))
+                                    return@launch
+                                }
+                            }
+                        }
+                        if(cmd.requiredUserPermissions.isNotEmpty() && isFromGuild) {
+                            cmd.requiredUserPermissions.forEach {
+                                if(!member!!.hasPermission(it)) {
+                                    errorHandler.onMissingUserPermission(user, it, CommandOrigin(interaction = interaction))
+                                }
+                            }
+                        }
                         if(cmd is HybridCommand) {
-                            if(cmd.autoAcknowledge) deferReply().queue()
                             val args = mutableListOf<String>()
+
                             if(subcommandGroup != null) args += subcommandGroup!!
                             if(subcommandName != null) args += subcommandName!!
                             for (option in options) {
                                 args += option.asString
                             }
-                            cmd.run(CommandResult(channel, args, user, member, CommandOrigin(hook = hook)))
+
+                            catchError {
+                                cmd.run(CommandResult(channel, args, user, member, CommandOrigin(interaction = interaction)))
+                            }
                         } else if(cmd is SlashCommand) {
-                            cmd.run(this@on)
+                            catchError {
+                                cmd.run(this@on)
+                            }
                         }
                     }
                 }
@@ -120,14 +143,24 @@ class CommandHandler internal constructor(val jda: JDA) {
                 if (cmd.name == command) {
                     jda.scope.launch {
                         if(cmd is HybridCommand) {
-                            cmd.run(CommandResult(channel, args, author, member, CommandOrigin(channel)))
+                            catchError {
+                                cmd.run(CommandResult(channel, args, author, member, CommandOrigin(channel)))
+                            }
                         } else if(cmd is StandardCommand) {
-                            cmd.run(message, args, guild.commandPrefix)
+                            catchError {
+                                cmd.run(message, args)
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    private suspend fun catchError(method: suspend () -> Unit) = try {
+        method()
+    } catch(e: Exception) {
+        errorHandler.onError(e)
     }
 
 }

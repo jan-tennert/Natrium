@@ -32,6 +32,8 @@ exceptions:
     active: true
 
 naming:
+  MatchingDeclarationName:
+    active: false
   EnumNaming:
     enumEntryPattern: '[A-Z0-9_]+'
 
@@ -64,6 +66,8 @@ potential-bugs:
     active: true
 
 style:
+  ForbiddenComment:
+    active: false
   CollapsibleIfStatements:
     active: true
   DataClassContainsFunctions:

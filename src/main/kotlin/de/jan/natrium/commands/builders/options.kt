@@ -1,5 +1,6 @@
 package de.jan.natrium.commands.builders
 
+import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
@@ -11,43 +12,70 @@ class OptionsBuilder {
     internal val options = mutableListOf<OptionData>()
 
     @OptionBuilder
-    fun int(name: String, description: String, required: Boolean = true) {
-        options.add(OptionData(OptionType.INTEGER, name, description, required))
+    fun int(name: String, description: String, required: Boolean = true, choices: ChoiceBuilder<Int>.() -> Unit = {}) {
+        val option = OptionData(OptionType.INTEGER, name, description, required)
+        val choiceBuilder = ChoiceBuilder<Int>().apply(choices)
+        if(choiceBuilder.choices.isNotEmpty()) option.addChoices(choiceBuilder.choices)
+        options += option
     }
 
     @OptionBuilder
-    fun string(name: String, description: String, required: Boolean = true) {
-        options.add(OptionData(OptionType.STRING, name, description, required))
+    fun string(name: String, description: String, required: Boolean = true, choices: ChoiceBuilder<String>.() -> Unit = {}) {
+        val option = OptionData(OptionType.STRING, name, description, required)
+        val choiceBuilder = ChoiceBuilder<String>().apply(choices)
+        if(choiceBuilder.choices.isNotEmpty()) option.addChoices(choiceBuilder.choices)
+        options += option
     }
 
     @OptionBuilder
     fun user(name: String, description: String, required: Boolean = true) {
-        options.add(OptionData(OptionType.USER, name, description, required))
+        options += OptionData(OptionType.USER, name, description, required)
     }
 
     @OptionBuilder
     fun mentionable(name: String, description: String, required: Boolean = true) {
-        options.add(OptionData(OptionType.MENTIONABLE, name, description, required))
+        options += OptionData(OptionType.MENTIONABLE, name, description, required)
     }
 
     @OptionBuilder
     fun channel(name: String, description: String, required: Boolean = true) {
-        options.add(OptionData(OptionType.CHANNEL, name, description, required))
+        options += OptionData(OptionType.CHANNEL, name, description, required)
     }
 
     @OptionBuilder
     fun boolean(name: String, description: String, required: Boolean = true) {
-        options.add(OptionData(OptionType.BOOLEAN, name, description, required))
+        options += OptionData(OptionType.BOOLEAN, name, description, required)
     }
 
     @OptionBuilder
     fun role(name: String, description: String, required: Boolean = true) {
-        options.add(OptionData(OptionType.ROLE, name, description, required))
+        options += OptionData(OptionType.ROLE, name, description, required)
     }
 
-    /*@OptionBuilder
-    fun number(name: String, description: String, required: Boolean = true)
-    JDA doesn't support that currently*/
+    /* TODO: JDA doesn't support that right now
+    @OptionBuilder
+    fun number(name: String, description: String, required: Boolean = true, choices: ChoiceBuilder<Double>.() -> Unit = {}) {
+        val option = OptionData(OptionType.NUMBER, name, description, required)
+        val choiceBuilder = ChoiceBuilder<Double>().apply(choices)
+        if(choiceBuilder.choices.isNotEmpty()) option.addChoices(choiceBuilder.choices)
+        options += option
+    }
+    */
+
+}
+
+class ChoiceBuilder<V> {
+
+    internal val choices = mutableListOf<Command.Choice>()
+
+    @OptionBuilder
+    fun choice(name: String, value: V) {
+        if(value is Long) {
+            choices += Command.Choice(name, value)
+            return
+        }
+        choices += Command.Choice(name, value.toString())
+    }
 
 }
 

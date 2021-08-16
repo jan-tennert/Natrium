@@ -3,3 +3,4 @@
 /build/
 .idea
 /target/
+/src/main/kotlin/de/jan/natrium/Test.kt

@@ -14,9 +14,9 @@ interface ISlashCommand : Command {
         get() = listOf()
     val subCommandGroups: List<SubcommandGroupData>
         get() = listOf()
-    val guildOnlyIds: List<String>
-        get() = listOf()
     val autoRegister: Boolean
+        get() = true
+    val autoAcknowledge: Boolean
         get() = true
 
     fun build() = CommandData(name, description).apply {

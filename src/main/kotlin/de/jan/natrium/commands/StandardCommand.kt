@@ -4,6 +4,6 @@ import net.dv8tion.jda.api.entities.Message
 
 interface StandardCommand : Command {
 
-    suspend fun run(msg: Message, args: List<String>, prefix: String)
+    suspend fun run(msg: Message, args: List<String>)
 
 }
