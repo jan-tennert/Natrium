@@ -1,4 +1,4 @@
-# Natrium [![](https://jitci.com/gh/jan-tennert/Natrium/svg)](https://jitci.com/gh/jan-tennert/Natrium) ![](https://jitpack.io/v/jan-tennert/Natrium.svg)
+# Natrium [![](https://jitci.com/gh/jan-tennert/Natrium/svg)](https://jitci.com/gh/jan-tennert/Natrium) [![](https://jitpack.io/v/jan-tennert/Natrium.svg)](https://jitpack.io/#jan-tennert/Natrium/)
 
 A command framework with normal and slash commands for JDA with some useful Kotlin Extensions 
 # Warning: This project is still pretty much WiP
