@@ -6,6 +6,7 @@ version = "1.0-SNAPSHOT"
 plugins {
     kotlin("jvm") version "1.5.21"
     id("io.gitlab.arturbosch.detekt").version("1.18.0")
+    id("maven-publish")
 }
 
 repositories {
