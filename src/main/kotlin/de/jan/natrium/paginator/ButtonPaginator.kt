@@ -24,6 +24,7 @@ class ButtonPaginator private constructor(
     var firstButton = PaginatorButton("First")
     private val buttonsAfter = mutableListOf<Component>()
     private val buttonsBefore = mutableListOf<Component>()
+    val allowedUsers = mutableListOf<Long>()
     var page = 1
 
     fun build() : Message {
@@ -64,14 +65,19 @@ class ButtonPaginator private constructor(
             for (component in buttonsBefore) {
                 of(component as Button)
             }
-            of(firstButton.style, generateId(), firstButton.label, firstButton.emoji, disabled = page == 1) { update(it, ButtonType.FIRST) }
-            of(previousButton.style, generateId(), previousButton.label, previousButton.emoji, disabled = page == 1) { update(it, ButtonType.PREVIOUS) }
-            of(nextButton.style, generateId(), nextButton.label, nextButton.emoji, disabled = page == maxPage) { update(it, ButtonType.NEXT) }
-            of(lastButton.style, generateId(), lastButton.label, lastButton.emoji, disabled = page == maxPage) { update(it, ButtonType.LAST) }
+            of(firstButton.style, generateId(), firstButton.label, firstButton.emoji, disabled = page == 1) { checkUsers(it) {update(it, ButtonType.FIRST) } }
+            of(previousButton.style, generateId(), previousButton.label, previousButton.emoji, disabled = page == 1) { checkUsers(it) {update(it, ButtonType.PREVIOUS) } }
+            of(nextButton.style, generateId(), nextButton.label, nextButton.emoji, disabled = page == maxPage) { checkUsers(it) {update(it, ButtonType.NEXT) } }
+            of(lastButton.style, generateId(), lastButton.label, lastButton.emoji, disabled = page == maxPage) { checkUsers(it) {update(it, ButtonType.LAST) } }
             for (component in buttonsAfter) {
                 of(component as Button)
             }
         }
+    }
+
+    private fun checkUsers(event: ButtonClickEvent, whenNot: () -> Unit) {
+        if(allowedUsers.isNotEmpty() && event.user.idLong !in allowedUsers) return event.deferEdit().queue()
+        whenNot()
     }
 
     enum class ButtonType {
