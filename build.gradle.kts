@@ -39,6 +39,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
     implementation("com.github.jitpack:gradle-simple:1.0")
     implementation("com.sedmelluq:lavaplayer:1.3.77")
+    implementation("org.json:json:20210307")
 }
 
 tasks.withType<KotlinCompile>() {
