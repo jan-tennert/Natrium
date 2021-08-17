@@ -10,6 +10,7 @@ plugins {
 
 repositories {
     maven("https://m2.dv8tion.net/releases")
+    maven("https://jitpack.io")
     mavenCentral()
 }
 
@@ -23,6 +24,7 @@ detekt {
 dependencies {
     implementation("net.dv8tion:JDA:4.3.0_307")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
+    implementation("com.github.jitpack:gradle-simple:1.0")
 }
 
 tasks.withType<KotlinCompile>() {
