@@ -24,6 +24,9 @@ class SlashCommandImpl(var name: String? = null, var description: String? = null
 
     var guildOnlyIds = mutableListOf<Long>()
 
+    var autoRegister = true
+    var autoAcknowledge = false
+
     @PublishedApi
     internal var action: Action = Action {  }
 
@@ -72,6 +75,8 @@ inline fun slashCommand(standardCommand: SlashCommandImpl.() -> Unit) : SlashCom
         override val guildOnlyIds: List<Long> = impl.guildOnlyIds
         override val requiredBotPermissions = impl.botPermissions.toList()
         override val requiredUserPermissions = impl.userPermissions.toList()
+        override val autoRegister = impl.autoRegister
+        override val autoAcknowledge = impl.autoAcknowledge
 
     }
 }
