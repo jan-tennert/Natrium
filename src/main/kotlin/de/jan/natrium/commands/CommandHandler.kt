@@ -35,23 +35,22 @@ class CommandHandler internal constructor(val jda: JDA) {
         PrefixManager.prefixes = hashMapOf<String, String>().apply(init)
     }
 
-    operator fun plusAssign(slashCommand: SlashCommand) = register(slashCommand)
+    operator fun plusAssign(command: Command) = register(command)
 
-    operator fun plusAssign(hybridCommand: HybridCommand) = register(hybridCommand)
+    operator fun plusAssign(commands: List<Command>) = register(commands)
 
-    operator fun plusAssign(standardCommand: StandardCommand) = register(standardCommand)
-
-    fun register(slashCommand: SlashCommand) {
-        slashCommands.add(slashCommand)
+    fun register(command: Command) {
+        when(command) {
+            is StandardCommand -> standardCommands.add(command)
+            is SlashCommand -> slashCommands.add(command)
+            is HybridCommand -> hybridCommands.add(command)
+            else -> throw UnsupportedOperationException()
+        }
     }
 
-    fun register(hybridCommand: HybridCommand) {
-        hybridCommands.add(hybridCommand)
-    }
+    fun register(commands: List<Command>) = commands.forEach { register(it) }
 
-    fun register(standardCommand: StandardCommand) {
-        standardCommands.add(standardCommand)
-    }
+    fun register(vararg commands: Command) = register(commands.toList())
 
     /**
      * Updates all slash commands. You may need to call the [JDA.awaitReady] method to ensure that all guilds are loaded

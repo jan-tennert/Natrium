@@ -16,7 +16,6 @@ fun RowBuilder.selectionMenu(id: String, disabled: Boolean = false, placeholder:
         .addOptions(options)
     components += menu.build()
 
-    println(jda)
     jda?.on(predicate = { it.componentId == id }, action)
 }
 

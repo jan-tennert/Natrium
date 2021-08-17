@@ -2,7 +2,7 @@ package de.jan.natrium.commands
 
 import net.dv8tion.jda.api.Permission
 
-interface Command {
+sealed interface Command {
 
     /**
      * This is the command name
