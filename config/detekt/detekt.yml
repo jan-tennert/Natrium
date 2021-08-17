@@ -68,6 +68,8 @@ potential-bugs:
     active: true
   UselessPostfixExpression:
     active: true
+  ImplicitDefaultLocale:
+    active: false
 
 style:
   ForbiddenComment:

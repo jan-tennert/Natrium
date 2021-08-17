@@ -11,10 +11,6 @@ import java.util.concurrent.LinkedBlockingQueue
 class GuildMusicManager(manager: AudioPlayerManager, val guild: Guild) {
 
     val player: AudioPlayer = manager.createPlayer()
-    private val BASS_BOOST = floatArrayOf(
-        0.2f, 0.15f, 0.1f, 0.05f, 0.0f, -0.05f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f,
-        -0.1f, -0.1f, -0.1f, -0.1f
-    )
 
     val scheduler = TrackScheduler(player, guild)
     var volume: Int = 100
@@ -35,7 +31,7 @@ class GuildMusicManager(manager: AudioPlayerManager, val guild: Guild) {
             field = value
             if (value) {
                 for (i in BASS_BOOST.indices) {
-                    scheduler.equalizer.setGain(i, BASS_BOOST[i] + (1000))
+                    scheduler.equalizer.setGain(i, BASS_BOOST[i] + 1000)
                 }
             } else {
                 scheduler.resetEqualizer()
@@ -103,5 +99,12 @@ class GuildMusicManager(manager: AudioPlayerManager, val guild: Guild) {
 
     init {
         player.addListener(scheduler)
+    }
+
+    companion object {
+        val BASS_BOOST = floatArrayOf(
+        0.2f, 0.15f, 0.1f, 0.05f, 0.0f, -0.05f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f,
+        -0.1f, -0.1f, -0.1f, -0.1f
+        )
     }
 }

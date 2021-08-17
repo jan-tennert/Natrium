@@ -44,11 +44,9 @@ class AudioHandler {
                 play(v, v.guild, musicManager, playlist.tracks)
             }
 
-            override fun noMatches() {
-            }
+            override fun noMatches() = Unit
 
-            override fun loadFailed(exception: FriendlyException) {
-            }
+            override fun loadFailed(exception: FriendlyException) = Unit
 
             fun formatSeconds(timeInSeconds: Long): String {
                 val dur = Duration.ofMillis(timeInSeconds)
@@ -86,18 +84,14 @@ class AudioHandler {
         }
     }
 
-    fun getGuildMusicManager(channel: TextChannel): GuildMusicManager {
-        return getGuildAudioPlayer(channel.guild)
-    }
+    fun getGuildMusicManager(channel: TextChannel) = getGuildAudioPlayer(channel.guild)
 
     fun skipTrack(channel: TextChannel) {
         val musicManager = getGuildAudioPlayer(channel.guild)
         musicManager.skip()
     }
 
-    fun isPlayingIn(g: Guild): Boolean {
-        return musicManagers[g.idLong] != null
-    }
+    fun isPlayingIn(g: Guild) = musicManagers[g.idLong] != null
 
     init {
         playerManager = DefaultAudioPlayerManager()
