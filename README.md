@@ -14,4 +14,4 @@ A command framework with normal and slash commands for JDA with some useful Kotl
 
 # Download
 
-This project is currently only downloadable through jitpack.
+This project is currently only downloadable through [jitpack](https://jitpack.io/#jan-tennert/Natrium).
