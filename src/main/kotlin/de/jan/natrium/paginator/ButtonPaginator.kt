@@ -5,18 +5,19 @@ import de.jan.natrium.interactions.of
 import de.jan.natrium.messagebuilder.KMessageBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Emoji
+import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageChannel
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent
 import net.dv8tion.jda.api.interactions.components.Button
 import net.dv8tion.jda.api.interactions.components.ButtonStyle
 import net.dv8tion.jda.api.interactions.components.Component
 import net.dv8tion.jda.api.requests.restaction.MessageAction
+import net.dv8tion.jda.api.requests.restaction.interactions.ReplyAction
 
 class ButtonPaginator private constructor(
     private val jda: JDA,
     private val listener: ButtonPaginatorListener,
-    private val maxPage: Int,
-    private val channel: MessageChannel) {
+    private val maxPage: Int) {
 
     var nextButton = PaginatorButton( emoji = Emoji.fromUnicode("➡️"))
     var previousButton = PaginatorButton(emoji = Emoji.fromUnicode("⬅️"))
@@ -26,11 +27,11 @@ class ButtonPaginator private constructor(
     private val buttonsBefore = mutableListOf<Component>()
     var page = 1
 
-    fun build() : MessageAction {
+    fun build() : Message {
         val currentBuilder = KMessageBuilder(jda)
         listener.onUpdate(currentBuilder, page)
         currentBuilder.addButtons()
-        return channel.sendMessage(currentBuilder.build())
+        return currentBuilder.build()
     }
 
     fun beforePaginatorButtons(builder: RowBuilder.() -> Unit) {
@@ -82,8 +83,12 @@ class ButtonPaginator private constructor(
     }
 
     companion object {
-        fun MessageChannel.sendPaginator(maxPage: Int, listener: ButtonPaginatorListener) = ButtonPaginator(jda, listener, maxPage, this)
-        fun MessageChannel.sendPaginator(maxPage: Int, listener: (KMessageBuilder, Int, Int) -> Unit) = sendPaginator(maxPage) { builder, page -> listener(builder, page, maxPage) }
+        fun MessageChannel.createPaginator(maxPage: Int, listener: ButtonPaginatorListener) = ButtonPaginator(jda, listener, maxPage)
+        fun MessageChannel.createPaginator(maxPage: Int, listener: (KMessageBuilder, Int, Int) -> Unit) = createPaginator(maxPage) { builder, page -> listener(builder, page, maxPage) }
+        fun ReplyAction.createPaginator(maxPage: Int, listener: ButtonPaginatorListener) = ButtonPaginator(jda, listener, maxPage)
+        fun ReplyAction.createPaginator(maxPage: Int, listener: (KMessageBuilder, Int, Int) -> Unit) = ButtonPaginator(jda, { builder, page -> listener(builder, page, maxPage) }, maxPage)
+        fun create(maxPage: Int, jda: JDA, listener: ButtonPaginatorListener) = ButtonPaginator(jda, listener, maxPage)
+        fun create(maxPage: Int, jda: JDA, listener: (KMessageBuilder, Int, Int) -> Unit) = create(maxPage, jda) { builder, page -> listener(builder, page, maxPage) }
     }
 
 }
