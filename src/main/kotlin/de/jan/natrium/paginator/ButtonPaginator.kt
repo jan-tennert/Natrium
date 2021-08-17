@@ -84,11 +84,8 @@ class ButtonPaginator private constructor(
 
     companion object {
         fun MessageChannel.createPaginator(maxPage: Int, listener: ButtonPaginatorListener) = ButtonPaginator(jda, listener, maxPage)
-        fun MessageChannel.createPaginator(maxPage: Int, listener: (KMessageBuilder, Int, Int) -> Unit) = createPaginator(maxPage) { builder, page -> listener(builder, page, maxPage) }
         fun ReplyAction.createPaginator(maxPage: Int, listener: ButtonPaginatorListener) = ButtonPaginator(jda, listener, maxPage)
-        fun ReplyAction.createPaginator(maxPage: Int, listener: (KMessageBuilder, Int, Int) -> Unit) = ButtonPaginator(jda, { builder, page -> listener(builder, page, maxPage) }, maxPage)
         fun create(maxPage: Int, jda: JDA, listener: ButtonPaginatorListener) = ButtonPaginator(jda, listener, maxPage)
-        fun create(maxPage: Int, jda: JDA, listener: (KMessageBuilder, Int, Int) -> Unit) = create(maxPage, jda) { builder, page -> listener(builder, page, maxPage) }
     }
 
 }
