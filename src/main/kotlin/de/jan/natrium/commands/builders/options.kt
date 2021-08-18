@@ -53,7 +53,6 @@ class OptionsBuilder {
         options += OptionData(OptionType.ROLE, name, description, required)
     }
 
-    /* TODO: JDA doesn't support that right now
     @TypeSafeBuilder
     fun number(name: String, description: String, required: Boolean = true, choices: ChoiceBuilder<Double>.() -> Unit = {}) {
         val option = OptionData(OptionType.NUMBER, name, description, required)
@@ -61,7 +60,6 @@ class OptionsBuilder {
         if(choiceBuilder.choices.isNotEmpty()) option.addChoices(choiceBuilder.choices)
         options += option
     }
-    */
 
 }
 
@@ -72,6 +70,9 @@ class ChoiceBuilder<V> {
     @TypeSafeBuilder
     fun choice(name: String, value: V) {
         if(value is Long) {
+            choices += Command.Choice(name, value)
+            return
+        } else if(value is Double) {
             choices += Command.Choice(name, value)
             return
         }

@@ -15,8 +15,8 @@ import net.dv8tion.jda.api.interactions.components.Component
 
 class ButtonPaginator private constructor(
     private val jda: JDA,
-    private val listener: ButtonPaginatorListener,
-    private val maxPage: Int) {
+    private var listener: ButtonPaginatorListener = ButtonPaginatorListener { _, _ ->  },
+    var maxPage: Int = 20) {
 
     var nextButton = PaginatorButton( emoji = Emoji.fromUnicode("➡️"))
     var previousButton = PaginatorButton(emoji = Emoji.fromUnicode("⬅️"))
@@ -25,9 +25,9 @@ class ButtonPaginator private constructor(
     private val buttonsAfter = mutableListOf<Component>()
     private val buttonsBefore = mutableListOf<Component>()
     val allowedUsers = mutableListOf<Long>()
-    var page = 1
+    private var page = 1
 
-    fun build() : Message {
+    internal fun build() : Message {
         val currentBuilder = KMessageBuilder(jda)
         listener.onUpdate(currentBuilder, page)
         currentBuilder.addButtons()
@@ -60,6 +60,10 @@ class ButtonPaginator private constructor(
             .queue()
     }
 
+    fun onPageChanged(listener: ButtonPaginatorListener) {
+        this.listener = listener
+    }
+
     private fun KMessageBuilder.addButtons() {
         addActionRow(jda) {
             for (component in buttonsBefore) {
@@ -88,9 +92,9 @@ class ButtonPaginator private constructor(
     }
 
     companion object {
-        fun MessageChannel.createPaginator(maxPage: Int, listener: ButtonPaginatorListener) = ButtonPaginator(jda, listener, maxPage)
-        fun Interaction.createPaginator(maxPage: Int, listener: ButtonPaginatorListener) = ButtonPaginator(this.user.jda, listener, maxPage)
-        fun create(maxPage: Int, jda: JDA, listener: ButtonPaginatorListener) = ButtonPaginator(jda, listener, maxPage)
+        fun MessageChannel.createPaginator(builder: ButtonPaginator.() -> Unit) = ButtonPaginator(jda).apply(builder).build()
+        fun Interaction.createPaginator(builder: ButtonPaginator.() -> Unit) = ButtonPaginator(user.jda).apply(builder).build()
+        fun create(jda: JDA, builder: ButtonPaginator.() -> Unit) = ButtonPaginator(jda).apply(builder).build()
     }
 
 }
