@@ -1,7 +1,6 @@
 package de.jan.natrium.commands.builders
 
 import de.jan.natrium.TypeSafeBuilder
-import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.SlashCommand
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
