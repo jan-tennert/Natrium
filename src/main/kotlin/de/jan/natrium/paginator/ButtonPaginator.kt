@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Emoji
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageChannel
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent
+import net.dv8tion.jda.api.interactions.Interaction
 import net.dv8tion.jda.api.interactions.components.Button
 import net.dv8tion.jda.api.interactions.components.ButtonStyle
 import net.dv8tion.jda.api.interactions.components.Component
@@ -89,7 +90,7 @@ class ButtonPaginator private constructor(
 
     companion object {
         fun MessageChannel.createPaginator(maxPage: Int, listener: ButtonPaginatorListener) = ButtonPaginator(jda, listener, maxPage)
-        fun ReplyAction.createPaginator(maxPage: Int, listener: ButtonPaginatorListener) = ButtonPaginator(jda, listener, maxPage)
+        fun Interaction.createPaginator(maxPage: Int, listener: ButtonPaginatorListener) = ButtonPaginator(this.user.jda, listener, maxPage)
         fun create(maxPage: Int, jda: JDA, listener: ButtonPaginatorListener) = ButtonPaginator(jda, listener, maxPage)
     }
 

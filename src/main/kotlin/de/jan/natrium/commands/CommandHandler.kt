@@ -1,20 +1,30 @@
 package de.jan.natrium.commands
 
 import de.jan.natrium.errors.ErrorHandler
+import de.jan.natrium.errors.ErrorHandlerImpl
 import de.jan.natrium.events.on
 import de.jan.natrium.scope
+import de.jan.natrium.utils.schedule
 import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
 
 class CommandHandler internal constructor(val jda: JDA) {
 
     private val slashCommands = mutableListOf<SlashCommand>()
     private val standardCommands = mutableListOf<StandardCommand>()
     private val hybridCommands = mutableListOf<HybridCommand>()
+    private val timeoutUsers = ConcurrentHashMap<Long, LocalDateTime>()
+    var defaultTimeout: Duration = Duration.ZERO
     val commands: List<Command>
         get() = slashCommands + standardCommands + hybridCommands
 
@@ -33,6 +43,10 @@ class CommandHandler internal constructor(val jda: JDA) {
 
     fun loadPrefixes(init: HashMap<String, String>.() -> Unit) {
         PrefixManager.prefixes = hashMapOf<String, String>().apply(init)
+    }
+
+    fun setErrorHandler(errorHandlerImpl: ErrorHandlerImpl.() -> Unit) {
+        errorHandler = ErrorHandlerImpl().apply(errorHandlerImpl).build()
     }
 
     operator fun plusAssign(command: Command) = register(command)
@@ -92,24 +106,15 @@ class CommandHandler internal constructor(val jda: JDA) {
                 if (cmd.name == name) {
                     jda.scope.launch {
                         if(cmd.autoAcknowledge) deferReply().queue()
-                        if(cmd.requiredBotPermissions.isNotEmpty() && isFromGuild) {
-                            cmd.requiredBotPermissions.forEach {
-                                if(!guild!!.selfMember.hasPermission(it)) {
-                                    errorHandler.onMissingBotPermission(user, it, CommandOrigin(interaction = interaction))
-                                    return@launch
-                                }
-                            }
-                        }
-                        if(cmd.requiredUserPermissions.isNotEmpty() && isFromGuild) {
-                            cmd.requiredUserPermissions.forEach {
-                                if(!member!!.hasPermission(it)) {
-                                    errorHandler.onMissingUserPermission(user, it, CommandOrigin(interaction = interaction))
-                                }
-                            }
-                        }
+
+                        //Check permissions
+                        if(checkBotPermission(isFromGuild, cmd, user, guild?.selfMember, CommandOrigin(interaction = interaction)))
+                        if(checkPermission(isFromGuild, cmd, member, CommandOrigin(interaction = interaction))) return@launch
+
                         if(cmd is HybridCommand) {
                             val args = mutableListOf<String>()
 
+                            //Convert slash command options to normal arguments
                             if(subcommandGroup != null) args += subcommandGroup!!
                             if(subcommandName != null) args += subcommandName!!
                             for (option in options) {
@@ -142,13 +147,40 @@ class CommandHandler internal constructor(val jda: JDA) {
             for (cmd in commands) {
                 if (cmd.name == command) {
                     jda.scope.launch {
+                        //Check permissions
+                        if(checkBotPermission(isFromGuild, cmd, author, if(isFromGuild) guild.selfMember else null, CommandOrigin(channel)))
+                        if(checkPermission(isFromGuild, cmd, member, CommandOrigin(channel))) return@launch
+
+                        //Check if the user can't run the command because the timeout isn't over
+                        if(timeoutUsers.containsKey(author.idLong)) {
+                            val remaining = (cmd as AbstractCommand).timeout - Duration.ofMillis(ChronoUnit.MILLIS.between(timeoutUsers[author.idLong], LocalDateTime.now()))
+                            errorHandler.onCommandTimeout(author, CommandOrigin(channel), remaining)
+                            return@launch
+                        }
+
                         if(cmd is HybridCommand) {
+
+
+
                             catchError(user = author, CommandOrigin(channel)) {
                                 cmd.run(CommandResult(channel, args, author, member, CommandOrigin(channel)))
                             }
                         } else if(cmd is StandardCommand) {
+
                             catchError(user = author, CommandOrigin(channel)) {
                                 cmd.run(message, args)
+                            }
+
+                        }
+
+                        //Add timeout, if available
+                        if(!cmd.timeout.isZero || !defaultTimeout.isZero) {
+                            timeoutUsers[author.idLong] = LocalDateTime.now()
+                            launch {
+                                val timeout = if(cmd.timeout.isZero) defaultTimeout else cmd.timeout
+                                schedule(timeout) {
+                                    timeoutUsers.remove(author.idLong)
+                                }
                             }
                         }
                     }
@@ -161,6 +193,30 @@ class CommandHandler internal constructor(val jda: JDA) {
         method()
     } catch(e: Exception) {
         errorHandler.onError(e, user, origin)
+    }
+
+    private fun checkPermission(guild: Boolean, cmd: Command, member: Member?, origin: CommandOrigin): Boolean {
+        if(cmd.requiredUserPermissions.isNotEmpty() && guild) {
+            cmd.requiredUserPermissions.forEach {
+                if(!member!!.hasPermission(it)) {
+                    errorHandler.onMissingUserPermission(member!!.user, it, origin)
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    private fun checkBotPermission(guild: Boolean, cmd: Command, author: User, selfMember: Member?, origin: CommandOrigin): Boolean {
+        if(cmd.requiredBotPermissions.isNotEmpty() && guild) {
+            cmd.requiredBotPermissions.forEach {
+                if(!selfMember!!.hasPermission(it)) {
+                    errorHandler.onMissingBotPermission(author, it, origin)
+                    return true
+                }
+            }
+        }
+        return false
     }
 
 }

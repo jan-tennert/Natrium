@@ -42,6 +42,6 @@ dependencies {
     implementation("org.json:json:20210307")
 }
 
-tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "1.8"
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 }

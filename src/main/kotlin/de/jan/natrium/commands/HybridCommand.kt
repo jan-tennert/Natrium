@@ -3,8 +3,9 @@ package de.jan.natrium.commands
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.MessageChannel
 import net.dv8tion.jda.api.entities.User
+import java.time.Duration
 
-interface HybridCommand : ISlashCommand {
+interface HybridCommand : ISlashCommand, AbstractCommand {
 
     fun run(result: CommandResult)
 

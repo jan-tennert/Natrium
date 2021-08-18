@@ -4,6 +4,7 @@ import de.jan.natrium.commands.Command
 import de.jan.natrium.commands.CommandOrigin
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.User
+import java.time.Duration
 
 open class ErrorHandler {
 
@@ -28,6 +29,11 @@ open class ErrorHandler {
      */
     open fun onError(exception: Exception, user: User, origin: CommandOrigin) = exception.printStackTrace()
 
+    /**
+     * This method will be run if the user runs the command even if the timeout isn't over
+     */
+    open fun onCommandTimeout(user: User, origin: CommandOrigin, remaining: Duration) = Unit
+
 }
 
 class ErrorHandlerImpl {
@@ -35,6 +41,7 @@ class ErrorHandlerImpl {
     internal var onError: (Exception, User, CommandOrigin) -> Unit = {_, _ , _ ->}
     internal var onMissingBotPermission: (User, Permission, CommandOrigin) -> Unit = {_, _ , _ ->}
     internal var onMissingUserPermission: (User, Permission, CommandOrigin) -> Unit = {_, _, _ ->}
+    internal var onCommandTimeout: (User, CommandOrigin, Duration) -> Unit = { _, _, _ ->}
 
     fun onError(action: (Exception, User, CommandOrigin) -> Unit) {
         onError = action
@@ -48,11 +55,16 @@ class ErrorHandlerImpl {
         onMissingBotPermission = action
     }
 
+    fun onCommandTimeout(action: (User, CommandOrigin, Duration) -> Unit) {
+        onCommandTimeout = action
+    }
+
     @PublishedApi
     internal fun build() = object : ErrorHandler() {
-        override fun onError(exception: Exception, user: User, origin: CommandOrigin) = this@ErrorHandlerImpl.onError(exception, user, origin)
-        override fun onMissingBotPermission(user: User, permission: Permission, origin: CommandOrigin) = this@ErrorHandlerImpl.onMissingBotPermission(user, permission, origin)
-        override fun onMissingUserPermission(user: User, permission: Permission, origin: CommandOrigin) = this@ErrorHandlerImpl.onMissingUserPermission(user, permission, origin)
+        override fun onError(exception: Exception, user: User, origin: CommandOrigin) = this@ErrorHandlerImpl.onError.invoke(exception, user, origin)
+        override fun onMissingBotPermission(user: User, permission: Permission, origin: CommandOrigin) = this@ErrorHandlerImpl.onMissingBotPermission.invoke(user, permission, origin)
+        override fun onMissingUserPermission(user: User, permission: Permission, origin: CommandOrigin) = this@ErrorHandlerImpl.onMissingUserPermission.invoke(user, permission, origin)
+        override fun onCommandTimeout(user: User, origin: CommandOrigin, remaining: Duration) = this@ErrorHandlerImpl.onCommandTimeout.invoke(user, origin, remaining)
     }
 
 }

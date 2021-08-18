@@ -4,6 +4,7 @@ import de.jan.natrium.commands.StandardCommand
 import de.jan.natrium.commands.builders.StandardCommandImpl.Action
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Message
+import java.time.Duration
 
 class StandardCommandImpl(var name: String? = null, var description: String? = null, var syntax: String? = null) {
 
@@ -14,6 +15,8 @@ class StandardCommandImpl(var name: String? = null, var description: String? = n
     var botPermissions = mutableListOf<Permission>()
 
     var guildOnlyIds = mutableListOf<Long>()
+
+    var timeout: Duration = Duration.ZERO
 
     fun action(action: Action) {
         this.action = action
@@ -42,6 +45,7 @@ inline fun standardCommand(standardCommand: StandardCommandImpl.() -> Unit) : St
         override val guildOnlyIds = impl.guildOnlyIds.toList()
         override val requiredBotPermissions = impl.botPermissions.toList()
         override val requiredUserPermissions = impl.userPermissions.toList()
+        override val timeout = impl.timeout
 
     }
 }
