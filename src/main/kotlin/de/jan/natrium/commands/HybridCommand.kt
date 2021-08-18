@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.MessageChannel
 import net.dv8tion.jda.api.entities.User
 
-interface HybridCommand : ISlashCommand, AbstractCommand {
+interface HybridCommand : ISlashCommand {
 
     fun run(result: CommandResult)
 

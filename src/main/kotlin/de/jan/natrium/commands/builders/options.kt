@@ -3,6 +3,7 @@ package de.jan.natrium.commands.builders
 import de.jan.natrium.TypeSafeBuilder
 import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.OptionType
+import net.dv8tion.jda.api.interactions.commands.SlashCommand
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
 inline fun buildOptions(builder: OptionsBuilder.() -> Unit) = OptionsBuilder().apply(builder).options.toList()
@@ -53,30 +54,31 @@ class OptionsBuilder {
         options += OptionData(OptionType.ROLE, name, description, required)
     }
 
-    @TypeSafeBuilder
+    //PR outdated
+    /*@TypeSafeBuilder
     fun number(name: String, description: String, required: Boolean = true, choices: ChoiceBuilder<Double>.() -> Unit = {}) {
         val option = OptionData(OptionType.NUMBER, name, description, required)
         val choiceBuilder = ChoiceBuilder<Double>().apply(choices)
         if(choiceBuilder.choices.isNotEmpty()) option.addChoices(choiceBuilder.choices)
         options += option
-    }
+    }*/
 
 }
 
 class ChoiceBuilder<V> {
 
-    internal val choices = mutableListOf<Command.Choice>()
+    internal val choices = mutableListOf<SlashCommand.Choice>()
 
     @TypeSafeBuilder
     fun choice(name: String, value: V) {
         if(value is Long) {
-            choices += Command.Choice(name, value)
+            choices += SlashCommand.Choice(name, value)
             return
-        } else if(value is Double) {
-            choices += Command.Choice(name, value)
+        } /*else if(value is Double) {
+            choices += SlashCommand.Choice(name, value)
             return
-        }
-        choices += Command.Choice(name, value.toString())
+        }*/
+        choices += SlashCommand.Choice(name, value.toString())
     }
 
 }
