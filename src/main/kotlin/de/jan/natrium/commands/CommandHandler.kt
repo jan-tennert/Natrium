@@ -120,11 +120,11 @@ class CommandHandler internal constructor(val jda: JDA) {
                                 args += option.asString
                             }
 
-                            catchError(user, CommandOrigin(interaction = interaction)) {
+                            catchError(user, CommandOrigin(interaction = interaction), this@on) {
                                 cmd.run(CommandResult(channel, args, user, member, CommandOrigin(interaction = interaction)))
                             }
                         } else if(cmd is SlashCommand) {
-                            catchError(user, CommandOrigin(interaction = interaction)) {
+                            catchError(user, CommandOrigin(interaction = interaction), this@on) {
                                 cmd.run(this@on)
                             }
                         }
@@ -183,9 +183,10 @@ class CommandHandler internal constructor(val jda: JDA) {
         }
     }
 
-    private suspend fun catchError(user: User, origin: CommandOrigin, method: suspend () -> Unit) = try {
+    private suspend fun catchError(user: User, origin: CommandOrigin, event: SlashCommandEvent? = null, method: suspend () -> Unit) = try {
         method()
     } catch(e: Exception) {
+        if(event != null && !event.isAcknowledged) event.deferReply().queue()
         errorHandler.onError(e, user, origin)
     }
 
