@@ -36,7 +36,7 @@ detekt {
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
-    implementation("com.github.aasmart:JDA:f72376387c")
+    implementation("com.github.aasmart:JDA:ffb2974506")
     implementation("com.sedmelluq:lavaplayer:1.3.77")
     implementation("org.json:json:20210307")
     implementation("com.github.jan-tennert:Translatable:1.1")

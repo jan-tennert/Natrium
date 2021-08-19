@@ -53,14 +53,13 @@ class OptionsBuilder {
         options += OptionData(OptionType.ROLE, name, description, required)
     }
 
-    //PR outdated
-    /*@TypeSafeBuilder
+    @TypeSafeBuilder
     fun number(name: String, description: String, required: Boolean = true, choices: ChoiceBuilder<Double>.() -> Unit = {}) {
         val option = OptionData(OptionType.NUMBER, name, description, required)
         val choiceBuilder = ChoiceBuilder<Double>().apply(choices)
         if(choiceBuilder.choices.isNotEmpty()) option.addChoices(choiceBuilder.choices)
         options += option
-    }*/
+    }
 
 }
 
@@ -73,10 +72,10 @@ class ChoiceBuilder<V> {
         if(value is Long) {
             choices += SlashCommand.Choice(name, value)
             return
-        } /*else if(value is Double) {
+        } else if(value is Double) {
             choices += SlashCommand.Choice(name, value)
             return
-        }*/
+        }
         choices += SlashCommand.Choice(name, value.toString())
     }
 
