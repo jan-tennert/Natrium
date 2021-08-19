@@ -147,7 +147,7 @@ class CommandHandler internal constructor(val jda: JDA) {
                 if (cmd.name == command) {
                     jda.scope.launch {
                         //Check permissions
-                        if(checkBotPermission(isFromGuild, cmd, author, if(isFromGuild) guild.selfMember else null, CommandOrigin(channel)))
+                        if(checkBotPermission(isFromGuild, cmd, author, if(isFromGuild) guild.selfMember else null, CommandOrigin(channel))) return@launch
                         if(checkPermission(isFromGuild, cmd, member, CommandOrigin(channel))) return@launch
 
                         //Check if the user can't run the command because the timeout isn't over
