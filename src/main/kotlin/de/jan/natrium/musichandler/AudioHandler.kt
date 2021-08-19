@@ -1,4 +1,4 @@
-package de.jan.jdaktx.musichandler
+package de.jan.natrium.musichandler
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager

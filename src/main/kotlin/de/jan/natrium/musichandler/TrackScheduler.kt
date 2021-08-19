@@ -1,4 +1,4 @@
-package de.jan.jdaktx.musichandler
+package de.jan.natrium.musichandler
 
 import com.sedmelluq.discord.lavaplayer.filter.equalizer.EqualizerFactory
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer

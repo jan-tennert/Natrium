@@ -107,8 +107,8 @@ class CommandHandler internal constructor(val jda: JDA) {
                         if(cmd.autoAcknowledge) deferReply().queue()
 
                         //Check permissions
-                        if(checkBotPermission(isFromGuild, cmd, user, guild?.selfMember, CommandOrigin(interaction = interaction)))
-                        if(checkPermission(isFromGuild, cmd, member, CommandOrigin(interaction = interaction))) return@launch
+                        if(checkBotPermission(isFromGuild, cmd, user, guild?.selfMember, CommandOrigin(interaction = interaction), this@on)) return@launch
+                        if(checkPermission(isFromGuild, cmd, member, CommandOrigin(interaction = interaction), this@on)) return@launch
 
                         if(cmd is HybridCommand) {
                             val args = mutableListOf<String>()
@@ -158,18 +158,13 @@ class CommandHandler internal constructor(val jda: JDA) {
                         }
 
                         if(cmd is HybridCommand) {
-
-
-
                             catchError(user = author, CommandOrigin(channel)) {
                                 cmd.run(CommandResult(channel, args, author, member, CommandOrigin(channel)))
                             }
                         } else if(cmd is StandardCommand) {
-
                             catchError(user = author, CommandOrigin(channel)) {
                                 cmd.run(message, args)
                             }
-
                         }
 
                         //Add timeout, if available
@@ -194,11 +189,12 @@ class CommandHandler internal constructor(val jda: JDA) {
         errorHandler.onError(e, user, origin)
     }
 
-    private fun checkPermission(guild: Boolean, cmd: Command, member: Member?, origin: CommandOrigin): Boolean {
+    private fun checkPermission(guild: Boolean, cmd: Command, member: Member?, origin: CommandOrigin, event: SlashCommandEvent? = null): Boolean {
         if(cmd.requiredUserPermissions.isNotEmpty() && guild) {
             cmd.requiredUserPermissions.forEach {
                 if(!member!!.hasPermission(it)) {
-                    errorHandler.onMissingUserPermission(member!!.user, it, origin)
+                    if(event != null && !event.isAcknowledged) event.deferReply().queue()
+                    errorHandler.onMissingUserPermission(member.user, it, origin)
                     return true
                 }
             }
@@ -206,10 +202,11 @@ class CommandHandler internal constructor(val jda: JDA) {
         return false
     }
 
-    private fun checkBotPermission(guild: Boolean, cmd: Command, author: User, selfMember: Member?, origin: CommandOrigin): Boolean {
+    private fun checkBotPermission(guild: Boolean, cmd: Command, author: User, selfMember: Member?, origin: CommandOrigin, event: SlashCommandEvent? = null): Boolean {
         if(cmd.requiredBotPermissions.isNotEmpty() && guild) {
             cmd.requiredBotPermissions.forEach {
                 if(!selfMember!!.hasPermission(it)) {
+                    if(event != null && !event.isAcknowledged) event.deferReply().queue()
                     errorHandler.onMissingBotPermission(author, it, origin)
                     return true
                 }
