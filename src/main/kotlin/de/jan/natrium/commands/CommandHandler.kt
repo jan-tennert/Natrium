@@ -198,12 +198,16 @@ class CommandHandler internal constructor(val jda: JDA) {
         if(this is MessageCommandEvent) {
             for (cmd in contextMenuCommands.filter { it.type == CommandType.MESSAGE_COMMAND }.map { it as MessageCommand }) {
                 if(cmd.name == name) {
+                    if(checkBotPermission(isFromGuild, cmd, user, if(isFromGuild) guild?.selfMember else null, CommandOrigin(channel))) return@on
+                    if(checkPermission(isFromGuild, cmd, member, CommandOrigin(channel))) return@on
                     cmd.run(this)
                 }
             }
         } else if(this is UserCommandEvent) {
             for (cmd in contextMenuCommands.filter { it.type == CommandType.USER_COMMAND }.map { it as UserCommand }) {
                 if(cmd.name == name) {
+                    if(checkBotPermission(isFromGuild, cmd, user, if(isFromGuild) guild?.selfMember else null, CommandOrigin(channel))) return@on
+                    if(checkPermission(isFromGuild, cmd, member, CommandOrigin(channel))) return@on
                     cmd.run(this)
                 }
             }
