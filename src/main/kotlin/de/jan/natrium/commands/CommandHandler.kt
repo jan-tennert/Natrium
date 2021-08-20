@@ -5,6 +5,8 @@ import de.jan.natrium.errors.ErrorHandlerImpl
 import de.jan.natrium.events.on
 import de.jan.natrium.scope
 import de.jan.natrium.utils.schedule
+import de.jan.translatable.Translator
+import de.jan.translatable.TranslatorManager
 import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Member
@@ -26,12 +28,7 @@ class CommandHandler internal constructor(val jda: JDA) {
     var defaultTimeout: Duration = Duration.ZERO
     val commands: List<Command>
         get() = slashCommands + standardCommands + hybridCommands
-
-    var globalPrefix: String = PrefixManager.globalPrefix
-        set(value) {
-            PrefixManager.globalPrefix = field
-            field = value
-        }
+    var translationManager: TranslatorManager? = null
     var allowMentionPrefix: Boolean = true //TODO
     var errorHandler = ErrorHandler()
 
@@ -40,8 +37,18 @@ class CommandHandler internal constructor(val jda: JDA) {
         initStandardCommandHandler()
     }
 
-    fun loadPrefixes(init: HashMap<String, String>.() -> Unit) {
-        PrefixManager.prefixes = hashMapOf<String, String>().apply(init)
+    /**
+     * You can use this method if you store the prefixes in a database
+     */
+    fun loadPrefixes(init: HashMap<Long, String>.() -> Unit) {
+        GuildManager.prefixes = hashMapOf<Long, String>().apply(init)
+    }
+
+    /**
+     * You can use this method if you store the languages in a database
+     */
+    fun loadLanguages(init: HashMap<Long, Translator>.() -> Unit) {
+        GuildManager.languages = hashMapOf<Long, Translator>().apply(init)
     }
 
     fun setErrorHandler(errorHandlerImpl: ErrorHandlerImpl.() -> Unit) {

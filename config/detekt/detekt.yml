@@ -109,8 +109,7 @@ style:
   MandatoryBracesLoops:
     active: true
   MaxLineLength:
-    active: true
-    maxLineLength: 300
+    active: false
     excludeCommentStatements: true
   NoTabs:
     active: true

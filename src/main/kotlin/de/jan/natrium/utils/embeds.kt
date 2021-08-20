@@ -1,4 +1,4 @@
-package de.jan.natrium.extensions
+package de.jan.natrium.utils
 
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageChannel

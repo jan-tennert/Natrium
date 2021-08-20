@@ -1,4 +1,4 @@
-package de.jan.natrium.paginator
+package de.jan.natrium.dialogs.paginator
 
 import de.jan.natrium.messagebuilder.KMessageBuilder
 

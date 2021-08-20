@@ -75,3 +75,5 @@ class KMessageBuilder(private val jda: JDA? = null) {
     }
 
 }
+
+fun buildMessage(jda: JDA? = null, builder: KMessageBuilder.() -> Unit) = KMessageBuilder(jda).apply(builder).build()
