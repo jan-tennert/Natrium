@@ -15,7 +15,9 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.commands.GenericCommandEvent
+import net.dv8tion.jda.api.events.interaction.commands.MessageContextCommandEvent
 import net.dv8tion.jda.api.events.interaction.commands.SlashCommandEvent
+import net.dv8tion.jda.api.events.interaction.commands.UserContextCommandEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.interactions.commands.CommandType
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction
@@ -195,16 +197,16 @@ class CommandHandler internal constructor(val jda: JDA) {
     }
 
     private fun initContextMenuCommands() = jda.on<GenericCommandEvent> {
-        if(this is MessageCommandEvent) {
-            for (cmd in contextMenuCommands.filter { it.type == CommandType.MESSAGE_COMMAND }.map { it as MessageCommand }) {
+        if(this is MessageContextCommandEvent) {
+            for (cmd in contextMenuCommands.filter { it.type == CommandType.MESSAGE_CONTEXT }.map { it as MessageCommand }) {
                 if(cmd.name == name) {
                     if(checkBotPermission(isFromGuild, cmd, user, if(isFromGuild) guild?.selfMember else null, CommandOrigin(channel))) return@on
                     if(checkPermission(isFromGuild, cmd, member, CommandOrigin(channel))) return@on
                     cmd.run(this)
                 }
             }
-        } else if(this is UserCommandEvent) {
-            for (cmd in contextMenuCommands.filter { it.type == CommandType.USER_COMMAND }.map { it as UserCommand }) {
+        } else if(this is UserContextCommandEvent) {
+            for (cmd in contextMenuCommands.filter { it.type == CommandType.USER_CONTEXT }.map { it as UserCommand }) {
                 if(cmd.name == name) {
                     if(checkBotPermission(isFromGuild, cmd, user, if(isFromGuild) guild?.selfMember else null, CommandOrigin(channel))) return@on
                     if(checkPermission(isFromGuild, cmd, member, CommandOrigin(channel))) return@on
