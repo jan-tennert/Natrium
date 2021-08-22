@@ -1,6 +1,7 @@
 package de.jan.natrium.utils
 
 import com.neovisionaries.ws.client.WebSocketFactory
+import de.jan.natrium.enableNatrium
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.audio.factory.IAudioSendFactory
@@ -120,6 +121,8 @@ class KJDABuilder(val builder: JDABuilder) {
 
     fun useSharding(id: Int, total: Int) = builder.useSharding(id, total)
 
+    fun enableNatrium() = builder.enableNatrium()
+
     @PublishedApi
     internal fun build() = builder.apply {
         addEventListeners(eventListeners)
@@ -154,6 +157,6 @@ class KJDABuilder(val builder: JDABuilder) {
 
 }
 
-inline fun DefaultJDA(token: String, builder: KJDABuilder.() -> Unit) = KJDABuilder(JDABuilder.createDefault(token)).apply(builder).builder.build()
-inline fun LightJDA(token: String, builder: KJDABuilder.() -> Unit) = KJDABuilder(JDABuilder.createLight(token)).apply(builder).builder.build()
-inline fun JDA(token: String, intents: List<GatewayIntent> = listOf(), builder: KJDABuilder.() -> Unit) = KJDABuilder(JDABuilder.create(token, intents)).apply(builder).build()
+inline fun DefaultJDA(token: String, builder: KJDABuilder.() -> Unit = {}) = KJDABuilder(JDABuilder.createDefault(token)).apply(builder).builder.build()
+inline fun LightJDA(token: String, builder: KJDABuilder.() -> Unit = {}) = KJDABuilder(JDABuilder.createLight(token)).apply(builder).builder.build()
+inline fun JDA(token: String, intents: List<GatewayIntent> = listOf(), builder: KJDABuilder.() -> Unit = {}) = KJDABuilder(JDABuilder.create(token, intents)).apply(builder).build()
