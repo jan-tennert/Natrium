@@ -1,23 +1,14 @@
 package de.jan.natrium.commands
 
 import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.interactions.commands.build.CommandData
 
-sealed interface Command {
+interface Command {
 
     /**
      * This is the command name
      */
     var name: String
-
-    /**
-     * This is the command syntax which can be used for things like a help command.
-     */
-    var syntax: String
-
-    /**
-     * This is the command description
-     */
-    var description: String
 
     /**
      * If not empty, only these guilds are able to use these commands
@@ -36,5 +27,7 @@ sealed interface Command {
      */
     val requiredBotPermissions: List<Permission>
         get() = listOf()
+
+    fun build(): CommandData
 
 }

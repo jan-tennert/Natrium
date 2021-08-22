@@ -1,5 +1,8 @@
 package de.jan.natrium.commands
 
+import de.jan.natrium.commands.contextmenus.ContextMenuCommand
+import de.jan.natrium.commands.contextmenus.MessageCommand
+import de.jan.natrium.commands.contextmenus.UserCommand
 import de.jan.natrium.errors.ErrorHandler
 import de.jan.natrium.errors.ErrorHandlerImpl
 import de.jan.natrium.events.on
@@ -11,8 +14,12 @@ import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.User
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent
+import net.dv8tion.jda.api.events.interaction.commands.GenericCommandEvent
+import net.dv8tion.jda.api.events.interaction.commands.MessageContextCommandEvent
+import net.dv8tion.jda.api.events.interaction.commands.SlashCommandEvent
+import net.dv8tion.jda.api.events.interaction.commands.UserContextCommandEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.interactions.commands.CommandType
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction
 import java.time.Duration
 import java.time.LocalDateTime
@@ -24,6 +31,7 @@ class CommandHandler internal constructor(val jda: JDA) {
     private val slashCommands = mutableListOf<SlashCommand>()
     private val standardCommands = mutableListOf<StandardCommand>()
     private val hybridCommands = mutableListOf<HybridCommand>()
+    private val contextMenuCommands = mutableListOf<ContextMenuCommand>()
     private val timeoutUsers = ConcurrentHashMap<Long, LocalDateTime>()
     var defaultTimeout: Duration = Duration.ZERO
     val commands: List<Command>
@@ -35,13 +43,7 @@ class CommandHandler internal constructor(val jda: JDA) {
     init {
         initSlashCommandHandler()
         initStandardCommandHandler()
-    }
-
-    /**
-     * You can use this method if you store the prefixes in a database
-     */
-    fun loadPrefixes(init: HashMap<Long, String>.() -> Unit) {
-        GuildManager.prefixes = hashMapOf<Long, String>().apply(init)
+        initContextMenuCommands()
     }
 
     /**
@@ -50,6 +52,9 @@ class CommandHandler internal constructor(val jda: JDA) {
     fun loadLanguages(init: HashMap<Long, Translator>.() -> Unit) {
         GuildManager.languages = hashMapOf<Long, Translator>().apply(init)
     }
+    fun loadPrefixes(init: HashMap<Long, String>.() -> Unit) {
+        GuildManager.prefixes = hashMapOf<Long, String>().apply(init)
+    }
 
     fun setErrorHandler(errorHandlerImpl: ErrorHandlerImpl.() -> Unit) {
         errorHandler = ErrorHandlerImpl().apply(errorHandlerImpl).build()
@@ -57,30 +62,32 @@ class CommandHandler internal constructor(val jda: JDA) {
 
     operator fun plusAssign(command: Command) = register(command)
 
-    operator fun plusAssign(commands: List<Command>) = register(commands)
+    operator fun plusAssign(commands: Collection<Command>) = register(commands)
 
     fun register(command: Command) {
         when(command) {
             is StandardCommand -> standardCommands.add(command)
             is SlashCommand -> slashCommands.add(command)
             is HybridCommand -> hybridCommands.add(command)
+            is ContextMenuCommand -> contextMenuCommands.add(command)
             else -> throw UnsupportedOperationException()
         }
     }
 
-    fun register(commands: List<Command>) = commands.forEach { register(it) }
+    fun register(commands: Collection<Command>) = commands.forEach { register(it) }
 
     fun register(vararg commands: Command) = register(commands.toList())
+
 
     /**
      * Updates all slash commands. You may need to call the [JDA.awaitReady] method to ensure that all guilds are loaded
      */
     fun finish(): CommandHandler {
-        val cmds = slashCommands + hybridCommands
+        val cmds = slashCommands + hybridCommands + contextMenuCommands
         val globalCommands = jda.updateCommands()
         val guildCommands = hashMapOf<Long, CommandListUpdateAction>()
         for (cmd in cmds) {
-            if(!cmd.autoRegister) continue
+            if(cmd is ISlashCommand && !cmd.autoRegister) continue
             if(cmd.guildOnlyIds.isNotEmpty()) {
                 for (id in cmd.guildOnlyIds) {
                     if(id in guildCommands.keys) {
@@ -105,8 +112,7 @@ class CommandHandler internal constructor(val jda: JDA) {
         return this
     }
 
-    private fun initSlashCommandHandler() =
-        jda.on<SlashCommandEvent> {
+    private fun initSlashCommandHandler() = jda.on<SlashCommandEvent> {
             val commands = slashCommands + hybridCommands
             for (cmd in commands) {
                 if (cmd.name == name) {
@@ -159,7 +165,7 @@ class CommandHandler internal constructor(val jda: JDA) {
 
                         //Check if the user can't run the command because the timeout isn't over
                         if(timeoutUsers.containsKey(author.idLong)) {
-                            val remaining = (cmd as AbstractCommand).timeout - Duration.ofMillis(ChronoUnit.MILLIS.between(timeoutUsers[author.idLong], LocalDateTime.now()))
+                            val remaining = cmd.timeout - Duration.ofMillis(ChronoUnit.MILLIS.between(timeoutUsers[author.idLong], LocalDateTime.now()))
                             errorHandler.onCommandTimeout(author, CommandOrigin(channel), remaining)
                             return@launch
                         }
@@ -185,6 +191,26 @@ class CommandHandler internal constructor(val jda: JDA) {
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private fun initContextMenuCommands() = jda.on<GenericCommandEvent> {
+        if(this is MessageContextCommandEvent) {
+            for (cmd in contextMenuCommands.filter { it.type == CommandType.MESSAGE_CONTEXT }.map { it as MessageCommand }) {
+                if(cmd.name == name) {
+                    if(checkBotPermission(isFromGuild, cmd, user, if(isFromGuild) guild?.selfMember else null, CommandOrigin(channel))) return@on
+                    if(checkPermission(isFromGuild, cmd, member, CommandOrigin(channel))) return@on
+                    cmd.run(this)
+                }
+            }
+        } else if(this is UserContextCommandEvent) {
+            for (cmd in contextMenuCommands.filter { it.type == CommandType.USER_CONTEXT }.map { it as UserCommand }) {
+                if(cmd.name == name) {
+                    if(checkBotPermission(isFromGuild, cmd, user, if(isFromGuild) guild?.selfMember else null, CommandOrigin(channel))) return@on
+                    if(checkPermission(isFromGuild, cmd, member, CommandOrigin(channel))) return@on
+                    cmd.run(this)
                 }
             }
         }
