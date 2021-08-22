@@ -36,6 +36,8 @@ exceptions:
     active: false
 
 naming:
+  FunctionNaming:
+    active: false
   MatchingDeclarationName:
     active: false
   EnumNaming:
