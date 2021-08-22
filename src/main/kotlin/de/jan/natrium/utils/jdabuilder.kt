@@ -157,11 +157,3 @@ class KJDABuilder(val builder: JDABuilder) {
 inline fun DefaultJDA(token: String, builder: KJDABuilder.() -> Unit) = KJDABuilder(JDABuilder.createDefault(token)).apply(builder).builder.build()
 inline fun LightJDA(token: String, builder: KJDABuilder.() -> Unit) = KJDABuilder(JDABuilder.createLight(token)).apply(builder).builder.build()
 inline fun JDA(token: String, intents: List<GatewayIntent> = listOf(), builder: KJDABuilder.() -> Unit) = KJDABuilder(JDABuilder.create(token, intents)).apply(builder).build()
-
-fun main() {
-    DefaultJDA("") {
-        intents {
-            + (GatewayIntent.DIRECT_MESSAGES + GatewayIntent.DIRECT_MESSAGE_TYPING + GatewayIntent.GUILD_BANS)
-        }
-    }
-}
