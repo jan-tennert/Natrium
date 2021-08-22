@@ -50,8 +50,8 @@ class KMessageBuilder(private val jda: JDA? = null) {
         """.trimIndent()
     }
 
-    fun newLine() {
-        content += "\n"
+    fun newLine(times: Int = 1) {
+        content += "\n".repeat(times)
     }
 
     fun italic(text: String) {
