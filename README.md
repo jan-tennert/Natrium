@@ -11,7 +11,7 @@ A command framework with normal and slash commands for JDA with some useful Kotl
 - Embed extensions
 - Music Manager (TODO)
 - [Component Builder](https://github.com/jan-tennert/Natrium/wiki/Components)
-- Translation Manager (TODO)
+- [Translation Manager](https://github.com/jan-tennert/Natrium/wiki/Multi-Language) ("Beta")
 
 # Download
 
